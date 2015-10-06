@@ -2,5 +2,165 @@ window.addEventListener("load",run,false);
 // global variables
 
 function run () {
-	
+
+}
+
+{
+	"Gender":{
+		"Male":{
+			"Twitter":25,
+			"LinkedIn":26,
+			"Facebook":66,
+			"Instagram":24,
+			"Pinterest":16
+		},
+		"Female":{
+			"Twitter":21,
+			"LinkedIn":25,
+			"Facebook":77,
+			"Instagram":31,
+			"Pinterest":44
+		}
+	},
+	"Race":{
+		"White":{
+			"Twitter":20,
+			"LinkedIn":26,
+			"Facebook":70,
+			"Instagram":21,
+			"Pinterest":32
+		},
+		"Black":{
+			"Twitter":28,
+			"LinkedIn":22,
+			"Facebook":67,
+			"Instagram":47,
+			"Pinterest":23
+		},
+		"Hispanic":{
+			"Twitter":28,
+			"LinkedIn":22,
+			"Facebook":75,
+			"Instagram":38,
+			"Pinterest":32
+		}
+
+	},
+	"Age":{
+		"18-29":{
+			"Twitter":32,
+			"LinkedIn":22,
+			"Facebook":82,
+			"Instagram":55,
+			"Pinterest":37
+		},
+		"30-49":{
+			"Twitter":29,
+			"LinkedIn":32,
+			"Facebook":79,
+			"Instagram":28,
+			"Pinterest":36
+		},
+		"50-64":{
+			"Twitter":13,
+			"LinkedIn":26,
+			"Facebook":64,
+			"Instagram":11,
+			"Pinterest":24
+		},
+		"65+":{
+			"Twitter":6,
+			"LinkedIn":12,
+			"Facebook":48,
+			"Instagram":4,
+			"Pinterest":16
+		}
+
+	},
+	"Education":{
+		"High school or less":{
+			"Twitter":19,
+			"LinkedIn":9,
+			"Facebook":71,
+			"Instagram":25,
+			"Pinterest":25
+		},
+		"Some college":{
+			"Twitter":23,
+			"LinkedIn":25,
+			"Facebook":72,
+			"Instagram":32,
+			"Pinterest":37
+		},
+		"College plus":{
+			"Twitter":27,
+			"LinkedIn":46,
+			"Facebook":72,
+			"Instagram":26,
+			"Pinterest":31
+		}
+
+	},
+	"Income":{
+		"Less than 30,000":{
+			"Twitter":21,
+			"LinkedIn":17,
+			"Facebook":73,
+			"Instagram":26,
+			"Pinterest":24
+		},
+		"30,000-49,999":{
+			"Twitter":19,
+			"LinkedIn":21,
+			"Facebook":72,
+			"Instagram":27,
+			"Pinterest":37
+		},
+		"50,000-74,999":{
+			"Twitter":25,
+			"LinkedIn":32,
+			"Facebook":66,
+			"Instagram":30,
+			"Pinterest":41
+		},
+		"75,000+":{
+			"Twitter":26,
+			"LinkedIn":41,
+			"Facebook":78,
+			"Instagram":26,
+			"Pinterest":30
+		}
+
+	},
+	"Region":{
+		"Urban":{
+			"Twitter":30,
+			"LinkedIn":30,
+			"Facebook":74,
+			"Instagram":32,
+			"Pinterest":26
+		},
+		"Suburban":{
+			"Twitter":21,
+			"LinkedIn":26,
+			"Facebook":72,
+			"Instagram":28,
+			"Pinterest":34
+		},
+		"Rural":{
+			"Twitter":15,
+			"LinkedIn":12,
+			"Facebook":67,
+			"Instagram":18,
+			"Pinterest":30
+		}
+
+	},
+	"Total":{
+		"Twitter":23,
+		"LinkedIn":25,
+		"Facebook":72,
+		"Instagram":28,
+		"Pinterest":31
+	}
 }
