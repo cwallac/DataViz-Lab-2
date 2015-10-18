@@ -1,11 +1,29 @@
 window.addEventListener("load",run,false);
+
+var barWidth = 10;
+var barMargin = 2;
+var titleHeight = 40;
+var barTitleHeight = 20;
+
+var y = d3.scale.linear()
+    .domain([0,100])
+    .range([100,0]);
+
+var networkColors = {
+	"Twitter":"#AA3939",
+	"LinkedIn":"#226666",
+	"Facebook": "#7B9F35",
+	"Instagram": "#2D882D",
+	"Pinterest": "#AA6C39"
+}
 // global variables
 
 function run () {
 
-}
+	
 
-{
+
+var data = {
 	"Gender":{
 		"Male":{
 			"Twitter":25,
@@ -162,5 +180,379 @@ function run () {
 		"Facebook":72,
 		"Instagram":28,
 		"Pinterest":31
+	}
+}
+
+var d3Data = [
+{
+"Demographic":"Region",
+"Categories":[
+	{
+	"Name":"Urban",
+	"Networks": [
+		{
+			"Name":"Twitter",
+			"Percent":30
+		},
+		{
+			"Name":"LinkedIn",
+			"Percent":30
+		},
+		{
+			"Name":"Facebook",
+			"Percent":74
+		},
+		{
+			"Name":"Instagram",
+			"Percent":32
+		},
+		{
+			"Name":"Pinterest",
+			"Percent":26
+		}
+	]
+	},
+	{
+	"Name":"Suburban",
+	"Networks": [
+		{
+			"Name":"Twitter",
+			"Percent":21
+		},
+		{
+			"Name":"LinkedIn",
+			"Percent":26
+		},
+		{
+			"Name":"Facebook",
+			"Percent":72
+		},
+		{
+			"Name":"Instagram",
+			"Percent":28
+		},
+		{
+			"Name":"Pinterest",
+			"Percent":34
+		}
+	]
+	},
+		{
+	"Name":"Rural",
+	"Networks": [
+		{
+			"Name":"Twitter",
+			"Percent":15
+		},
+		{
+			"Name":"LinkedIn",
+			"Percent":12
+		},
+		{
+			"Name":"Facebook",
+			"Percent":67
+		},
+		{
+			"Name":"Instagram",
+			"Percent":18
+		},
+		{
+			"Name":"Pinterest",
+			"Percent":30
+		}
+	]
+	}
+	
+	]
+},
+{
+"Demographic":"Income",
+"Categories":[
+	{
+	"Name":"< 30,000",
+	"Networks": [
+		{
+			"Name":"Twitter",
+			"Percent":21
+		},
+		{
+			"Name":"LinkedIn",
+			"Percent":17
+		},
+		{
+			"Name":"Facebook",
+			"Percent":73
+		},
+		{
+			"Name":"Instagram",
+			"Percent":26
+		},
+		{
+			"Name":"Pinterest",
+			"Percent":24
+		}
+	]
+	},
+	{
+	"Name":"30,000 - 49,999",
+	"Networks": [
+		{
+			"Name":"Twitter",
+			"Percent":19
+		},
+		{
+			"Name":"LinkedIn",
+			"Percent":21
+		},
+		{
+			"Name":"Facebook",
+			"Percent":72
+		},
+		{
+			"Name":"Instagram",
+			"Percent":27
+		},
+		{
+			"Name":"Pinterest",
+			"Percent":37
+		}
+	]
+	},
+		{
+	"Name":"50,000 -74,999",
+	"Networks": [
+		{
+			"Name":"Twitter",
+			"Percent":25
+		},
+		{
+			"Name":"LinkedIn",
+			"Percent":32
+		},
+		{
+			"Name":"Facebook",
+			"Percent":66
+		},
+		{
+			"Name":"Instagram",
+			"Percent":30
+		},
+		{
+			"Name":"Pinterest",
+			"Percent":41
+		}
+	]
+	},
+	{
+	"Name":"75,000 +",
+	"Networks": [
+		{
+			"Name":"Twitter",
+			"Percent":26
+		},
+		{
+			"Name":"LinkedIn",
+			"Percent":41
+		},
+		{
+			"Name":"Facebook",
+			"Percent":78
+		},
+		{
+			"Name":"Instagram",
+			"Percent":26
+		},
+		{
+			"Name":"Pinterest",
+			"Percent":30
+		}
+	]
+	}
+	
+	]
+}
+]
+
+
+
+//drawAll(data,50,150);
+draw(d3Data);
+}
+
+
+
+function draw(data) {
+	var startX = 200;
+	var startY = 200;
+	var currentX = 200;
+	var currentY = 200;
+	var deltaX = 150;
+
+	var barWidth = 20;
+	var barMargin = 5;
+	console.log(data.length);
+	var demoGroup = d3.select("svg")
+
+	var rows = demoGroup.selectAll("g")
+		.data(data)
+		.enter().append("g");
+		
+	rows
+			.attr("id", function(d) {
+				return d["Demographic"]
+			})
+			.attr("x",function() {
+				currentX = startX;
+				return currentX;
+			})
+			.attr("y", function() {
+				var presentY = currentY;
+				currentY += 100 + titleHeight;
+				return presentY;
+			})
+			.append("text")
+				.text(function(d) {
+					console.log(d["Categories"].length);
+					return d["Demographic"];
+				})
+				.attr("fontsize",30)
+				.attr("x", function(d) {
+					var centering = parseFloat(d["Categories"].length)/2*deltaX 
+					- this.getComputedTextLength()/2;
+					return parseInt(d3.select(this.parentNode).attr("x")) + centering;
+				})
+				.attr("y", function() {
+					return parseInt(d3.select(this.parentNode).attr("y")) + titleHeight;
+				});
+
+
+
+					 //Set rough # of ticks
+    
+
+
+
+
+	var column = rows
+		.selectAll("g")
+		.data(function(d, i) {
+			console.log(d["Categories"][i]);
+			return d["Categories"];
+		})
+		.enter().append("g");
+
+
+	column
+			.attr("id",function(d) {
+				return d["Name"];
+			})
+			.attr("y", function() {
+				return d3.select(this.parentNode).attr("y");
+			})
+			.attr("x", function(d, i) {
+				return parseInt(d3.select(this.parentNode).attr("x")) + i*deltaX
+			})
+			.append("text")
+				.text(function(d) {
+					return d["Name"];
+				})
+				.attr("font-size",15)
+				.attr("x", function() {
+					return parseFloat(d3.select(this.parentNode).attr("x")) + 
+					(barWidth + barMargin)*2.5 - this.getComputedTextLength()/2;
+				})
+				.attr("y", function() {
+					return parseInt(d3.select(this.parentNode).attr("y")) + barTitleHeight;
+				})
+			;
+
+	var bars = column.selectAll("rect")
+			.data(function(d) {
+				return d["Networks"];
+			})
+			.enter().append("rect");
+	bars
+			.attr("id",function(d) {
+			return d["Name"];
+		})
+			.attr("height",function(d)  {
+				return 100 - y(d["Percent"]);
+			})
+			.attr("width",barWidth)
+			.attr("y",function(d) {
+				return parseInt(d3.select(this.parentNode).attr("y")) - (100 - y(d["Percent"])) ;
+			})
+			.attr("x",function(d, i) {
+				return parseInt(d3.select(this.parentNode).attr("x")) + parseInt(i*(barWidth + barMargin));
+
+			})
+			.attr("fill",function(d) {
+				return networkColors[d["Name"]];
+			});
+
+var xAxis = d3.svg.axis()
+                  .orient("left")
+                  .scale(y)
+                  .ticks(2);
+	rows.append("g")
+		.attr("class", "y axis")
+		.attr("transform", function() {
+			return "translate(" + d3.select(this.parentNode).attr("x") +
+			"," + (parseInt(d3.select(this.parentNode).attr("y")) - y(0)) + ")"
+	})
+		.attr("fill","none")
+		.attr("stroke","black")
+		.attr("shape-rendering","crispEdges")
+		.attr("font-family","sans-serif")
+		.attr("font-size","11px")
+    .call(xAxis);
+			
+
+}
+
+function drawSpecDemographic(name, data, startX, startY, group) {
+	var socialNetworks = ["Twitter","Facebook","Pinterest","Instagram","LinkedIn"]
+
+	
+
+	var barPos = startX
+	for (var key in data) {
+		var height = data[key] ;
+		;
+		group.append("rect")
+		.attr("y",startY - height)
+		.attr("x",barPos)
+		.attr("width",barWidth)
+		.attr("height",height)
+		.attr("fill",networkColors[key]);
+		barPos += barWidth + barMargin;
+	}
+	group.append("text")
+		.text(name)
+		.attr("x",startX)
+		.attr("fontsize",15)
+		.attr("y",startY + 15 );
+}
+
+function drawDemographic(name, data, startX, startY, group) {
+	group.append("text")
+			.text(name)
+			.attr("x",startX)
+			.attr("fontsize",15)
+			.attr("y",startY);
+	for (var key in data) {
+		var demoGroup = group.append("g");
+		
+		drawSpecDemographic(key, data[key], startX, startY - titleHeight, demoGroup)
+		startX += 100
+	}
+}
+
+function drawAll(data, startX, startY) {
+	for (var key in data) {
+		var demoGroup = d3.select("svg")
+		.append("g");
+		drawDemographic(key, data[key],startX, startY, demoGroup);
+		startY += 100 + titleHeight;
 	}
 }
