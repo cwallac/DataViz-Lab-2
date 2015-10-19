@@ -188,8 +188,8 @@ var data = {
 	}
 }
 
-$("#segment input:radio").each(function() {
-	$(this).css("color", networkColors[this.id]);
+$("#network input:radio").parent().each(function() {
+	$(this).css("color", networkColors[this.childNodes[0].id]);
 });
 
 $("#segment input:radio").on("click", function() {
