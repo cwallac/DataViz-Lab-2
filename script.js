@@ -1,14 +1,5 @@
 window.addEventListener("load",run,false);
 
-var barWidth = 10;
-var barMargin = 2;
-var titleHeight = 40;
-var barTitleHeight = 20;
-
-var y = d3.scale.linear()
-    .domain([0,100])
-    .range([100,0]);
-
 var networkColors = {
 	"Twitter":"#AA3939",
 	"LinkedIn":"#226666",
@@ -19,9 +10,6 @@ var networkColors = {
 // global variables
 
 function run () {
-
-	
-
 
 var data = {
 	"Gender":{
@@ -376,81 +364,100 @@ var d3Data = [
 
 
 //drawAll(data,50,150);
-draw(d3Data);
+//draw(d3Data);
+drawSegment(data, "Region");
 }
 
+function drawSegment(data, segment) {
+	var presentSegment = data[segment];
 
+	var formattedData = {};
+	formattedData["Demographic"] = segment;
+	
+	var categoryList = [];
+	for (var key in presentSegment) {
+		var categoryInfo = {};
+		categoryInfo["Name"] = key;
+		var networkList = [];
+		for (var social in presentSegment[key]) {
+			var networkObject = {};
+			networkObject["Name"] = social;
+			networkObject["Percent"] = presentSegment[key][social];
+			networkList.push(networkObject);
+		}
 
-function draw(data) {
-	var startX = 200;
-	var startY = 200;
-	var currentX = 200;
-	var currentY = 200;
-	var deltaX = 150;
+		categoryInfo["Networks"] = networkList;
+		categoryList.push(categoryInfo)
+	}
+	formattedData["Categories"] = categoryList;
 
-	var barWidth = 20;
+	console.log(formattedData);
+	//Formatting parameters
+	var barWidth = 35;
 	var barMargin = 5;
-	console.log(data.length);
-	var demoGroup = d3.select("svg")
+	var titleHeight = 40;
+	var barTitleHeight = 20;
 
-	var rows = demoGroup.selectAll("g")
-		.data(data)
-		.enter().append("g");
-		
-	rows
-			.attr("id", function(d) {
-				return d["Demographic"]
-			})
-			.attr("x",function() {
-				currentX = startX;
-				return currentX;
+	var startX = 200;
+	var startY = 250;
+	var currentX = 200;
+	var currentY = 250;
+	var deltaX = 210;
+
+	//Scale function for height of question 2 bars
+	var yScale = d3.scale.linear()
+    .domain([0,100])
+    .range([200,0]);
+
+    //Axis object we will add
+    var yAxis = d3.svg.axis()
+                  .orient("left")
+                  .scale(yScale)
+                  .ticks(4);
+
+    //All info across a demographic lives here          
+	var wholeSlice = d3.select("svg").append("g")
+		.attr("id",function(d) {
+				return data["Name"];
 			})
 			.attr("y", function() {
-				var presentY = currentY;
-				currentY += 100 + titleHeight;
-				return presentY;
+				return startY;
 			})
-			.append("text")
-				.text(function(d) {
-					console.log(d["Categories"].length);
-					return d["Demographic"];
-				})
-				.attr("fontsize",30)
-				.attr("x", function(d) {
-					var centering = parseFloat(d["Categories"].length)/2*deltaX 
-					- this.getComputedTextLength()/2;
-					return parseInt(d3.select(this.parentNode).attr("x")) + centering;
-				})
-				.attr("y", function() {
-					return parseInt(d3.select(this.parentNode).attr("y")) + titleHeight;
-				});
+			.attr("x", function(d, i) {
+				return startX 
+			});
+	
+	wholeSlice.append("text")
+			.text(function() {
+				return "Social Media Use Across " + formattedData["Demographic"];
+			})
+			.attr("y", function() {
+				return startY - yScale(0);
+			})
+			.attr("x",function() {
+				//console.log(d3.select(this.parentNode).datum()["Categories"].length);
+				return startX + formattedData["Categories"].length/2*deltaX
+				- this.getComputedTextLength()/2;
+			})
+			.attr("font-size",function() {
+				return barTitleHeight;
+			});
 
-
-
-					 //Set rough # of ticks
-    
-
-
-
-
-	var column = rows
-		.selectAll("g")
-		.data(function(d, i) {
-			console.log(d["Categories"][i]);
-			return d["Categories"];
+	var socialSegment = wholeSlice.selectAll("g")
+		.data(function() {
+			return formattedData["Categories"];
 		})
 		.enter().append("g");
 
-
-	column
+	socialSegment
 			.attr("id",function(d) {
 				return d["Name"];
 			})
 			.attr("y", function() {
-				return d3.select(this.parentNode).attr("y");
+				return startY;
 			})
 			.attr("x", function(d, i) {
-				return parseInt(d3.select(this.parentNode).attr("x")) + i*deltaX
+				return startX + i*deltaX
 			})
 			.append("text")
 				.text(function(d) {
@@ -466,7 +473,7 @@ function draw(data) {
 				})
 			;
 
-	var bars = column.selectAll("rect")
+	var bars = socialSegment.selectAll("rect")
 			.data(function(d) {
 				return d["Networks"];
 			})
@@ -476,11 +483,11 @@ function draw(data) {
 			return d["Name"];
 		})
 			.attr("height",function(d)  {
-				return 100 - y(d["Percent"]);
+				return yScale(0) - yScale(d["Percent"]);
 			})
 			.attr("width",barWidth)
 			.attr("y",function(d) {
-				return parseInt(d3.select(this.parentNode).attr("y")) - (100 - y(d["Percent"])) ;
+				return parseInt(d3.select(this.parentNode).attr("y")) - (yScale(0) - yScale(d["Percent"])) ;
 			})
 			.attr("x",function(d, i) {
 				return parseInt(d3.select(this.parentNode).attr("x")) + parseInt(i*(barWidth + barMargin));
@@ -490,69 +497,21 @@ function draw(data) {
 				return networkColors[d["Name"]];
 			});
 
-var xAxis = d3.svg.axis()
-                  .orient("left")
-                  .scale(y)
-                  .ticks(2);
-	rows.append("g")
+	//Add axis
+	wholeSlice.append("g")
 		.attr("class", "y axis")
 		.attr("transform", function() {
 			return "translate(" + d3.select(this.parentNode).attr("x") +
-			"," + (parseInt(d3.select(this.parentNode).attr("y")) - y(0)) + ")"
+			"," + (parseInt(d3.select(this.parentNode).attr("y")) - yScale(0)) + ")"
 	})
 		.attr("fill","none")
 		.attr("stroke","black")
 		.attr("shape-rendering","crispEdges")
 		.attr("font-family","sans-serif")
 		.attr("font-size","11px")
-    .call(xAxis);
-			
+    .call(yAxis);
+
 
 }
 
-function drawSpecDemographic(name, data, startX, startY, group) {
-	var socialNetworks = ["Twitter","Facebook","Pinterest","Instagram","LinkedIn"]
 
-	
-
-	var barPos = startX
-	for (var key in data) {
-		var height = data[key] ;
-		;
-		group.append("rect")
-		.attr("y",startY - height)
-		.attr("x",barPos)
-		.attr("width",barWidth)
-		.attr("height",height)
-		.attr("fill",networkColors[key]);
-		barPos += barWidth + barMargin;
-	}
-	group.append("text")
-		.text(name)
-		.attr("x",startX)
-		.attr("fontsize",15)
-		.attr("y",startY + 15 );
-}
-
-function drawDemographic(name, data, startX, startY, group) {
-	group.append("text")
-			.text(name)
-			.attr("x",startX)
-			.attr("fontsize",15)
-			.attr("y",startY);
-	for (var key in data) {
-		var demoGroup = group.append("g");
-		
-		drawSpecDemographic(key, data[key], startX, startY - titleHeight, demoGroup)
-		startX += 100
-	}
-}
-
-function drawAll(data, startX, startY) {
-	for (var key in data) {
-		var demoGroup = d3.select("svg")
-		.append("g");
-		drawDemographic(key, data[key],startX, startY, demoGroup);
-		startY += 100 + titleHeight;
-	}
-}
