@@ -11,12 +11,24 @@ var y = d3.scale.linear()
     .range([100,0]);
 
 var networkColors = {
-	"Twitter":"#AA3939",
-	"LinkedIn":"#226666",
-	"Facebook": "#7B9F35",
-	"Instagram": "#2D882D",
-	"Pinterest": "#AA6C39"
+	"Twitter":"Orange",
+	"LinkedIn":"Blue",
+	"Facebook": "Red",
+	"Instagram": "Green",
+	"Pinterest": "Violet"
 }
+
+var axisLabel = {
+	"Gender":"Gender",
+	"Race":"Race",
+	"Age":"Age",
+	"Income":"Anual Income in USD",
+	"Region":"Region of Living",
+	"Education":"Education Level"
+}
+
+var currentSegment = "Gender";
+var currentNetwork = "Facebook"
 
 // global variables
 
@@ -122,7 +134,7 @@ var data = {
 
 	},
 	"Income":{
-		"Less than 30,000":{
+		"<30,000":{
 			"Twitter":21,
 			"LinkedIn":17,
 			"Facebook":73,
@@ -379,6 +391,14 @@ var d3Data = [
 
 //drawAll(data,50,150);
 draw(d3Data);
+$("#segment input:radio").on("click", function() {
+	currentSegment = this.id;
+	question1(data);
+});
+$("#network input:radio").on("click", function() {
+	currentNetwork = this.id;
+	question1(data);
+});
 question1(data);
 }
 
@@ -565,33 +585,85 @@ function drawBarGraph(startX, startY, data) {
 }
 
 function question1(data) {
-	siteSegmentBreakdown(data, "Facebook", "Race", 100, 50);
-	siteSegmentBreakdown(data, "Facebook", "Income", 100, 50);
+	siteSegmentBreakdown(data, currentNetwork, currentSegment);
 
 }
 
-function siteSegmentBreakdown(data, site, segment, startX, startY) {
+function siteSegmentBreakdown(data, site, segment) {
+	//Clear the old graph
+	d3.select("#question1").selectAll("g").remove();
+
+	//Generate the proper data array for the bars
 	var segmentData = data[segment];
 	var graphData = []
 	for (var demographic in segmentData) {
 		graphData.push({name: demographic, height: barScale * segmentData[demographic][site]})
 	}
-	d3.select("#question1").selectAll("g").remove();
+
+	var startX = (1000 - graphData.length * (barWidth + barMargin)) / 2 + 100
+	var startY = 100
+
+	//Make the bars
 	d3.select("#question1").selectAll("g")
-	.data(graphData)
-	.enter()
-	.append("g")
-	.append("rect")
-	.attr("x", function(d, i) {return startX + i * barWidth + (i) * barMargin;})
-	.attr("y", function(d, i) {return startY + barScale * 100 - d.height;})
-	.attr("width", barWidth)
-	.attr("height", function(d, i) {return d.height;})
-	.style("fill", networkColors[site]);
+		.data(graphData)
+		.enter()
+		.append("g")
+			.append("rect")
+				.attr("x", function(d, i) {return startX + i * barWidth + (i) * barMargin;})
+				.attr("y", function(d, i) {return startY + barScale * 100 - d.height;})
+				.attr("width", barWidth)
+				.attr("height", function(d, i) {return d.height;})
+				.style("fill", networkColors[site]);
+
+	//Make the text labels for the categories
 	d3.select("#question1").selectAll("g").append("text")
-	.text(function(d) {return d.name;})
-	.attr("x",startX)
-	.attr("fontsize",15)
-	.attr("x", function(d, i) {return startX + (i + .5) * barWidth + (i) * barMargin;})
-	.attr("y",startY + 100 * barScale + 15 )
-	.style("text-anchor", "middle");
+		.text(function(d) {return d.name;})
+		.attr("fontsize",15)
+		.attr("x", function(d, i) {return startX + (i + .5) * barWidth + (i) * barMargin;})
+		.attr("y",startY + 100 * barScale + 15 )
+		.style("text-anchor", "middle");
+
+	//Make the axis
+	var yAxis = d3.svg.axis()
+		.scale(d3.scale.linear().domain([0, 100]).range([100 * barScale, 0]))
+		.orient("left");
+	d3.select("#question1")
+		.append("g")
+			.attr("class", "y axis")
+			.attr("fill","none")
+			.attr("stroke","black")
+			.attr("shape-rendering","crispEdges")
+			.attr("font-family","sans-serif")
+			.attr("font-size","11px")
+			.attr("transform", "translate(" + startX + ", " + startY + ")")
+			.call(yAxis);
+
+	//Title the graph
+	d3.select("#question1")
+		.append("g")
+			.append("text")
+				.attr("x", startX + graphData.length * (barWidth + barMargin) / 2)
+				.attr("y", startY - 20)
+				.attr("font-size", "24px")
+				.style("text-anchor", "middle")
+				.text("Percent of internet users who use " + site + " broken down by " + segment);
+
+	//Label the x axis
+	d3.select("#question1")
+		.append("g")
+			.append("text")
+				.attr("x", startX + graphData.length * (barWidth + barMargin) / 2)
+				.attr("y", startY + barScale * 100 + 50)
+				.attr("font-size", "18px")
+				.style("text-anchor", "middle")
+				.text(axisLabel[segment]);
+
+	//Label the y axis
+	d3.select("#question1")
+		.append("g")
+			.append("text")
+				.attr("font-size", "18px")
+				.style("text-anchor", "middle")
+				.attr("transform", "translate(" + (startX - 50) + ", " + (startY + barScale * 50) + ")rotate(-90)")
+				.text("Percent of internet users who use " + site);
 }
