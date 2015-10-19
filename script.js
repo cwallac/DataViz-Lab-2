@@ -1,12 +1,29 @@
 window.addEventListener("load",run,false);
 
+var barWidth = 200;
+var barScale = 4
+var barMargin = 40;
+
 var networkColors = {
-	"Twitter":"#AA3939",
-	"LinkedIn":"#226666",
-	"Facebook": "#7B9F35",
-	"Instagram": "#2D882D",
-	"Pinterest": "#AA6C39"
+	"Twitter":"Orange",
+	"LinkedIn":"Blue",
+	"Facebook": "Red",
+	"Instagram": "Green",
+	"Pinterest": "Violet"
 }
+
+var axisLabel = {
+	"Gender":"Gender",
+	"Race":"Race",
+	"Age":"Age",
+	"Income":"Anual Income in USD",
+	"Region":"Region of Living",
+	"Education":"Education Level"
+}
+
+var currentSegment = "Gender";
+var currentNetwork = "Facebook"
+
 // global variables
 
 function run () {
@@ -108,7 +125,7 @@ var data = {
 
 	},
 	"Income":{
-		"Less than 30,000":{
+		"<30,000":{
 			"Twitter":21,
 			"LinkedIn":17,
 			"Facebook":73,
@@ -171,227 +188,29 @@ var data = {
 	}
 }
 
-var d3Data = [
-{
-"Demographic":"Region",
-"Categories":[
-	{
-	"Name":"Urban",
-	"Networks": [
-		{
-			"Name":"Twitter",
-			"Percent":30
-		},
-		{
-			"Name":"LinkedIn",
-			"Percent":30
-		},
-		{
-			"Name":"Facebook",
-			"Percent":74
-		},
-		{
-			"Name":"Instagram",
-			"Percent":32
-		},
-		{
-			"Name":"Pinterest",
-			"Percent":26
-		}
-	]
-	},
-	{
-	"Name":"Suburban",
-	"Networks": [
-		{
-			"Name":"Twitter",
-			"Percent":21
-		},
-		{
-			"Name":"LinkedIn",
-			"Percent":26
-		},
-		{
-			"Name":"Facebook",
-			"Percent":72
-		},
-		{
-			"Name":"Instagram",
-			"Percent":28
-		},
-		{
-			"Name":"Pinterest",
-			"Percent":34
-		}
-	]
-	},
-		{
-	"Name":"Rural",
-	"Networks": [
-		{
-			"Name":"Twitter",
-			"Percent":15
-		},
-		{
-			"Name":"LinkedIn",
-			"Percent":12
-		},
-		{
-			"Name":"Facebook",
-			"Percent":67
-		},
-		{
-			"Name":"Instagram",
-			"Percent":18
-		},
-		{
-			"Name":"Pinterest",
-			"Percent":30
-		}
-	]
-	}
+$("#segment input:radio").each(function() {
+	$(this).css("color", networkColors[this.id]);
+});
+
+$("#segment input:radio").on("click", function() {
+	currentSegment = this.id;
+	question1(data);
+	question2(data,currentSegment);
+});
+$("#network input:radio").on("click", function() {
+	currentNetwork = this.id;
+	question1(data);
 	
-	]
-},
-{
-"Demographic":"Income",
-"Categories":[
-	{
-	"Name":"< 30,000",
-	"Networks": [
-		{
-			"Name":"Twitter",
-			"Percent":21
-		},
-		{
-			"Name":"LinkedIn",
-			"Percent":17
-		},
-		{
-			"Name":"Facebook",
-			"Percent":73
-		},
-		{
-			"Name":"Instagram",
-			"Percent":26
-		},
-		{
-			"Name":"Pinterest",
-			"Percent":24
-		}
-	]
-	},
-	{
-	"Name":"30,000 - 49,999",
-	"Networks": [
-		{
-			"Name":"Twitter",
-			"Percent":19
-		},
-		{
-			"Name":"LinkedIn",
-			"Percent":21
-		},
-		{
-			"Name":"Facebook",
-			"Percent":72
-		},
-		{
-			"Name":"Instagram",
-			"Percent":27
-		},
-		{
-			"Name":"Pinterest",
-			"Percent":37
-		}
-	]
-	},
-		{
-	"Name":"50,000 -74,999",
-	"Networks": [
-		{
-			"Name":"Twitter",
-			"Percent":25
-		},
-		{
-			"Name":"LinkedIn",
-			"Percent":32
-		},
-		{
-			"Name":"Facebook",
-			"Percent":66
-		},
-		{
-			"Name":"Instagram",
-			"Percent":30
-		},
-		{
-			"Name":"Pinterest",
-			"Percent":41
-		}
-	]
-	},
-	{
-	"Name":"75,000 +",
-	"Networks": [
-		{
-			"Name":"Twitter",
-			"Percent":26
-		},
-		{
-			"Name":"LinkedIn",
-			"Percent":41
-		},
-		{
-			"Name":"Facebook",
-			"Percent":78
-		},
-		{
-			"Name":"Instagram",
-			"Percent":26
-		},
-		{
-			"Name":"Pinterest",
-			"Percent":30
-		}
-	]
-	}
-	
-	]
-}
-]
-
-
-
-//drawAll(data,50,150);
-//draw(d3Data);
-drawSegment(data, "Region");
+});
+question1(data);
+question2(data, currentSegment);
 }
 
-function drawSegment(data, segment) {
+function question2(data, segment) {
 	var presentSegment = data[segment];
 
-	var formattedData = {};
-	formattedData["Demographic"] = segment;
-	
-	var categoryList = [];
-	for (var key in presentSegment) {
-		var categoryInfo = {};
-		categoryInfo["Name"] = key;
-		var networkList = [];
-		for (var social in presentSegment[key]) {
-			var networkObject = {};
-			networkObject["Name"] = social;
-			networkObject["Percent"] = presentSegment[key][social];
-			networkList.push(networkObject);
-		}
+	var formattedData = parseData(presentSegment, segment);
 
-		categoryInfo["Networks"] = networkList;
-		categoryList.push(categoryInfo)
-	}
-	formattedData["Categories"] = categoryList;
-
-	console.log(formattedData);
 	//Formatting parameters
 	var barWidth = 35;
 	var barMargin = 5;
@@ -399,15 +218,16 @@ function drawSegment(data, segment) {
 	var barTitleHeight = 20;
 
 	var startX = 200;
-	var startY = 250;
+	var startY = 450;
 	var currentX = 200;
 	var currentY = 250;
 	var deltaX = 210;
-
 	//Scale function for height of question 2 bars
 	var yScale = d3.scale.linear()
     .domain([0,100])
-    .range([200,0]);
+    .range([400,0]);
+
+	d3.select("#question2").selectAll("g").remove();
 
     //Axis object we will add
     var yAxis = d3.svg.axis()
@@ -416,7 +236,7 @@ function drawSegment(data, segment) {
                   .ticks(4);
 
     //All info across a demographic lives here          
-	var wholeSlice = d3.select("svg").append("g")
+	var wholeSlice = d3.select("#question2").append("g")
 		.attr("id",function(d) {
 				return data["Name"];
 			})
@@ -427,6 +247,7 @@ function drawSegment(data, segment) {
 				return startX 
 			});
 	
+	//Add a title
 	wholeSlice.append("text")
 			.text(function() {
 				return "Social Media Use Across " + formattedData["Demographic"];
@@ -435,7 +256,6 @@ function drawSegment(data, segment) {
 				return startY - yScale(0);
 			})
 			.attr("x",function() {
-				//console.log(d3.select(this.parentNode).datum()["Categories"].length);
 				return startX + formattedData["Categories"].length/2*deltaX
 				- this.getComputedTextLength()/2;
 			})
@@ -443,12 +263,14 @@ function drawSegment(data, segment) {
 				return barTitleHeight;
 			});
 
+	//Making a specific demographic info
 	var socialSegment = wholeSlice.selectAll("g")
 		.data(function() {
 			return formattedData["Categories"];
 		})
 		.enter().append("g");
 
+	//Add relevant info to them
 	socialSegment
 			.attr("id",function(d) {
 				return d["Name"];
@@ -459,12 +281,14 @@ function drawSegment(data, segment) {
 			.attr("x", function(d, i) {
 				return startX + i*deltaX
 			})
+			//Label for demographic
 			.append("text")
 				.text(function(d) {
 					return d["Name"];
 				})
 				.attr("font-size",15)
 				.attr("x", function() {
+					//Center the text
 					return parseFloat(d3.select(this.parentNode).attr("x")) + 
 					(barWidth + barMargin)*2.5 - this.getComputedTextLength()/2;
 				})
@@ -473,6 +297,7 @@ function drawSegment(data, segment) {
 				})
 			;
 
+	//Each social network for each demographic
 	var bars = socialSegment.selectAll("rect")
 			.data(function(d) {
 				return d["Networks"];
@@ -514,4 +339,113 @@ function drawSegment(data, segment) {
 
 }
 
+function question1(data) {
+	siteSegmentBreakdown(data, currentNetwork, currentSegment);
+
+}
+
+function siteSegmentBreakdown(data, site, segment) {
+	//Clear the old graph
+	d3.select("#question1").selectAll("g").remove();
+
+	//Generate the proper data array for the bars
+	var segmentData = data[segment];
+	var graphData = []
+	for (var demographic in segmentData) {
+		graphData.push({name: demographic, height: barScale * segmentData[demographic][site]})
+	}
+
+	var startX = (1000 - graphData.length * (barWidth + barMargin)) / 2 + 100
+	var startY = 100
+
+	//Make the bars
+	d3.select("#question1").selectAll("g")
+		.data(graphData)
+		.enter()
+		.append("g")
+			.append("rect")
+				.attr("x", function(d, i) {return startX + i * barWidth + (i) * barMargin;})
+				.attr("y", function(d, i) {return startY + barScale * 100 - d.height;})
+				.attr("width", barWidth)
+				.attr("height", function(d, i) {return d.height;})
+				.style("fill", networkColors[site]);
+
+	//Make the text labels for the categories
+	d3.select("#question1").selectAll("g").append("text")
+		.text(function(d) {return d.name;})
+		.attr("fontsize",15)
+		.attr("x", function(d, i) {return startX + (i + .5) * barWidth + (i) * barMargin;})
+		.attr("y",startY + 100 * barScale + 15 )
+		.style("text-anchor", "middle");
+
+	//Make the axis
+	var yAxis = d3.svg.axis()
+		.scale(d3.scale.linear().domain([0, 100]).range([100 * barScale, 0]))
+		.orient("left");
+	d3.select("#question1")
+		.append("g")
+			.attr("class", "y axis")
+			.attr("fill","none")
+			.attr("stroke","black")
+			.attr("shape-rendering","crispEdges")
+			.attr("font-family","sans-serif")
+			.attr("font-size","11px")
+			.attr("transform", "translate(" + startX + ", " + startY + ")")
+			.call(yAxis);
+
+	//Title the graph
+	d3.select("#question1")
+		.append("g")
+			.append("text")
+				.attr("x", startX + graphData.length * (barWidth + barMargin) / 2)
+				.attr("y", startY - 20)
+				.attr("font-size", "24px")
+				.style("text-anchor", "middle")
+				.text("Percent of internet users who use " + site + " broken down by " + segment);
+
+	//Label the x axis
+	d3.select("#question1")
+		.append("g")
+			.append("text")
+				.attr("x", startX + graphData.length * (barWidth + barMargin) / 2)
+				.attr("y", startY + barScale * 100 + 50)
+				.attr("font-size", "18px")
+				.style("text-anchor", "middle")
+				.text(axisLabel[segment]);
+
+	//Label the y axis
+	d3.select("#question1")
+		.append("g")
+			.append("text")
+				.attr("font-size", "18px")
+				.style("text-anchor", "middle")
+				.attr("transform", "translate(" + (startX - 50) + ", " + (startY + barScale * 50) + ")rotate(-90)")
+				.text("Percent of internet users who use " + site);
+}
+
+//COnvert data into D3able datatype
+function parseData(presentSegment, segment) {
+		var formattedData = {};
+	formattedData["Demographic"] = segment;
+	
+	var categoryList = [];
+	for (var key in presentSegment) {
+		var categoryInfo = {};
+		categoryInfo["Name"] = key;
+		var networkList = [];
+		for (var social in presentSegment[key]) {
+			var networkObject = {};
+			networkObject["Name"] = social;
+			networkObject["Percent"] = presentSegment[key][social];
+			networkList.push(networkObject);
+		}
+
+		categoryInfo["Networks"] = networkList;
+		categoryList.push(categoryInfo)
+	}
+	formattedData["Categories"] = categoryList;
+
+	return formattedData;
+
+}
 

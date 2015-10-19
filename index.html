@@ -1,18 +1,3 @@
-Skip to content
-This repository  
-Search
-Pull requests
-Issues
-Gist
- @cwallac
- Unwatch 3
-  Star 0
- Fork 0 flymperopoulos/CanvasDrawing
-Branch: master  CanvasDrawing/main.html
-@acejang1994acejang1994 14 days ago koch snowflake
-2 contributors @flymperopoulos @acejang1994
-RawBlameHistory     283 lines (240 sloc)  8.08 KB
-
 <!-- saved from url=(0054)http://rpucella.net/courses/dataviz-fa15/project1.html -->
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
@@ -20,19 +5,50 @@ RawBlameHistory     283 lines (240 sloc)  8.08 KB
   <title>Project 1</title>
 
 <style type="text/css"></style>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet" integrity="sha256-MfvZlkHCEqatNoGiOXveE8FIwMzZg4W85qfrfIFBfYc= sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
 <script src="script.js"></script>
 </head>
 
 
 <body>
+
+  <div class="container">
+	
   
-  <h1>Project 2 Social Network Visualization</h1> 
-  <h2>Team: Chris Wallace, Josh Langowitz</h2>
+    <h1>Project 2 Social Network Visualization</h1> 
+    <h2>Team: Chris Wallace, Josh Langowitz</h2>
 
-  <svg width="1000" height="1000" id="question2">
+    <div class="radio-inline" id="segment">
+      <label class="radio-inline"><input type="radio" name="segment" checked="true" id="Gender">Gender</label>
+      <label class="radio-inline"><input type="radio" name="segment" id="Race">Race</label>
+      <label class="radio-inline"><input type="radio" name="segment" id="Income">Income</label>
+      <label class="radio-inline"><input type="radio" name="segment" id="Education">Education</label>
+      <label class="radio-inline"><input type="radio" name="segment" id="Region">Region</label>
+      <label class="radio-inline"><input type="radio" name="segment" id="Age">Age</label>
+    </div>
 
-  </svg>
+    <div></div>
+
+    <div class="radio-inline" id="network">
+      <label class="radio-inline"><input type="radio" name="network" checked="true" id="Facebook"><span>Facebook</span></label>
+      <label class="radio-inline"><input type="radio" name="network" id="Twitter">Twitter</label>
+      <label class="radio-inline"><input type="radio" name="network" id="Pinterest">Pinterest</label>
+      <label class="radio-inline"><input type="radio" name="network" id="LinkedIn">LinkedIn</label>
+      <label class="radio-inline"><input type="radio" name="network" id="Instagram">Instagram</label>
+    </div>
+
+    <div>
+      <svg width="1000" height="600" id="question1">
+
+      </svg>
+
+      <svg width="1500" height="1000" id="question2">
+
+      </svg>
+    </div>
+  </div>
 
 
   
