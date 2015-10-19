@@ -1,7 +1,8 @@
 window.addEventListener("load",run,false);
 
-var barWidth = 10;
-var barMargin = 2;
+var barWidth = 200;
+var barScale = 4
+var barMargin = 40;
 var titleHeight = 40;
 var barTitleHeight = 20;
 
@@ -16,6 +17,7 @@ var networkColors = {
 	"Instagram": "#2D882D",
 	"Pinterest": "#AA6C39"
 }
+
 // global variables
 
 function run () {
@@ -377,6 +379,7 @@ var d3Data = [
 
 //drawAll(data,50,150);
 draw(d3Data);
+question1(data);
 }
 
 
@@ -391,7 +394,7 @@ function draw(data) {
 	var barWidth = 20;
 	var barMargin = 5;
 	console.log(data.length);
-	var demoGroup = d3.select("svg")
+	var demoGroup = d3.select("#question2")
 
 	var rows = demoGroup.selectAll("g")
 		.data(data)
@@ -548,11 +551,47 @@ function drawDemographic(name, data, startX, startY, group) {
 	}
 }
 
-function drawAll(data, startX, startY) {
+function drawAll(data, startX, startY, group) {
 	for (var key in data) {
 		var demoGroup = d3.select("svg")
 		.append("g");
 		drawDemographic(key, data[key],startX, startY, demoGroup);
 		startY += 100 + titleHeight;
 	}
+}
+
+function drawBarGraph(startX, startY, data) {
+	var pos = startX
+}
+
+function question1(data) {
+	siteSegmentBreakdown(data, "Facebook", "Race", 100, 50);
+	siteSegmentBreakdown(data, "Facebook", "Income", 100, 50);
+
+}
+
+function siteSegmentBreakdown(data, site, segment, startX, startY) {
+	var segmentData = data[segment];
+	var graphData = []
+	for (var demographic in segmentData) {
+		graphData.push({name: demographic, height: barScale * segmentData[demographic][site]})
+	}
+	d3.select("#question1").selectAll("g").remove();
+	d3.select("#question1").selectAll("g")
+	.data(graphData)
+	.enter()
+	.append("g")
+	.append("rect")
+	.attr("x", function(d, i) {return startX + i * barWidth + (i) * barMargin;})
+	.attr("y", function(d, i) {return startY + barScale * 100 - d.height;})
+	.attr("width", barWidth)
+	.attr("height", function(d, i) {return d.height;})
+	.style("fill", networkColors[site]);
+	d3.select("#question1").selectAll("g").append("text")
+	.text(function(d) {return d.name;})
+	.attr("x",startX)
+	.attr("fontsize",15)
+	.attr("x", function(d, i) {return startX + (i + .5) * barWidth + (i) * barMargin;})
+	.attr("y",startY + 100 * barScale + 15 )
+	.style("text-anchor", "middle");
 }
